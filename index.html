@@ -1,0 +1,300 @@
+﻿<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Simulatore Esame Java</title>
+  <style>
+    :root {
+      --bg: #f4efe7;
+      --panel: #fffdf8;
+      --ink: #1f2933;
+      --accent: #0f766e;
+      --danger-bg: #fee2e2;
+      --danger-text: #7f1d1d;
+      --ok-bg: #dcfce7;
+      --ok-text: #14532d;
+      --muted: #5f6c7b;
+      --border: #d7cfc2;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Tahoma, sans-serif;
+      background:
+        radial-gradient(circle at 10% 0%, #f6dfc6 0%, transparent 35%),
+        radial-gradient(circle at 90% 100%, #c6ebe6 0%, transparent 35%),
+        var(--bg);
+      color: var(--ink);
+      min-height: 100vh;
+    }
+    .wrap { max-width: 1100px; margin: 24px auto; padding: 0 16px; }
+    .timer {
+      position: fixed; top: 12px; left: 12px; background: #0f172a; color: #f8fafc;
+      padding: 10px 14px; border-radius: 10px; font-weight: 700; z-index: 50;
+      letter-spacing: 0.5px; box-shadow: 0 8px 18px rgba(0,0,0,0.18);
+    }
+    .card {
+      background: var(--panel); border: 1px solid var(--border); border-radius: 14px;
+      padding: 18px; box-shadow: 0 8px 18px rgba(31,41,51,0.08); margin-bottom: 12px;
+    }
+    h1 { margin-top: 0; margin-bottom: 6px; font-size: 1.5rem; }
+    .meta { color: var(--muted); margin-bottom: 10px; font-size: 0.95rem; }
+    .prompt { white-space: pre-wrap; line-height: 1.45; margin: 0; }
+    #editor {
+      width: 100%;
+      min-height: 420px;
+      border: 1px solid #b8b1a4;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
+    button { border: 0; padding: 10px 14px; border-radius: 10px; cursor: pointer; font-weight: 600; }
+    .primary { background: var(--accent); color: white; }
+    .secondary { background: #dbe4ee; color: #0f172a; }
+    .warning { background: #fbbf24; color: #1f2937; }
+    .result {
+      margin-top: 12px; border-radius: 10px; padding: 12px; display: none;
+      border: 1px solid transparent; white-space: pre-wrap; line-height: 1.4;
+    }
+    .result.error { display: block; background: var(--danger-bg); color: var(--danger-text); border-color: #fca5a5; }
+    .result.ok { display: block; background: var(--ok-bg); color: var(--ok-text); border-color: #86efac; }
+    .badge {
+      display: inline-block; padding: 4px 8px; border-radius: 999px; font-size: 12px;
+      font-weight: 600; background: #e2e8f0; color: #0f172a; margin-right: 6px;
+    }
+    @media (max-width: 768px) {
+      #editor { min-height: 320px; }
+      .wrap { margin-top: 72px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="timer" id="timer">Tempo 00:00</div>
+  <div class="wrap">
+    <div class="card">
+      <h1>Simulatore Esame Java (Localhost)</h1>
+      <div class="meta">10 domande random dal tuo set PDF, test nascosti, feedback compilazione/logica.</div>
+      <div id="envInfo" class="meta"></div>
+      <div class="row">
+        <label for="esoneroSelect">Prova:</label>
+        <select id="esoneroSelect">
+          <option value="1">Esonero 1</option>
+          <option value="2" selected>Esonero 2</option>
+          <option value="3">Esonero 3</option>
+        </select>
+        <button class="warning" id="restartBtn">Nuovo Quiz Random</button>
+      </div>
+      <div id="catalogInfo" class="meta"></div>
+    </div>
+
+    <div class="card">
+      <div class="meta"><span class="badge" id="position"></span><span class="badge" id="qTitle"></span></div>
+      <p class="prompt" id="prompt"></p>
+    </div>
+
+    <div class="card">
+      <div id="editor"></div>
+      <div class="row">
+        <button class="secondary" id="prevBtn">Indietro</button>
+        <button class="secondary" id="nextBtn">Avanti</button>
+        <button class="primary" id="runBtn">Esegui Codice</button>
+      </div>
+      <div id="result" class="result"></div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.52.2/min/vs/loader.min.js"></script>
+  <script>
+    const state = {
+      sessionId: null,
+      questions: [],
+      current: 0,
+      answers: {},
+      timerSeconds: 0,
+      timerHandle: null,
+      editor: null,
+      model: null,
+    };
+
+    const positionEl = document.getElementById("position");
+    const qTitleEl = document.getElementById("qTitle");
+    const promptEl = document.getElementById("prompt");
+    const resultEl = document.getElementById("result");
+    const timerEl = document.getElementById("timer");
+    const envInfoEl = document.getElementById("envInfo");
+    const catalogInfoEl = document.getElementById("catalogInfo");
+    const esoneroSelectEl = document.getElementById("esoneroSelect");
+
+    function fmtTime(total) {
+      const mm = String(Math.floor(total / 60)).padStart(2, "0");
+      const ss = String(total % 60).padStart(2, "0");
+      return `${mm}:${ss}`;
+    }
+
+    function startTimer() {
+      if (state.timerHandle) clearInterval(state.timerHandle);
+      state.timerSeconds = 0;
+      timerEl.textContent = `Tempo ${fmtTime(0)}`;
+      state.timerHandle = setInterval(() => {
+        state.timerSeconds += 1;
+        timerEl.textContent = `Tempo ${fmtTime(state.timerSeconds)}`;
+      }, 1000);
+    }
+
+    function currentQuestion() { return state.questions[state.current]; }
+
+    function editorGetValue() {
+      return state.editor ? state.editor.getValue() : "";
+    }
+
+    function editorSetValue(value) {
+      if (state.editor) state.editor.setValue(value || "");
+    }
+
+    function saveCurrentCode() {
+      const q = currentQuestion();
+      if (!q) return;
+      state.answers[q.id] = editorGetValue();
+    }
+
+    function showResult(type, text) {
+      resultEl.className = `result ${type}`;
+      resultEl.textContent = text;
+    }
+
+    function clearResult() {
+      resultEl.className = "result";
+      resultEl.textContent = "";
+    }
+
+    function renderQuestion() {
+      const q = currentQuestion();
+      if (!q) return;
+      positionEl.textContent = `Domanda ${state.current + 1}/${state.questions.length}`;
+      qTitleEl.textContent = q.title;
+      promptEl.textContent = q.prompt;
+      editorSetValue(state.answers[q.id] ?? q.starter_code);
+      clearResult();
+    }
+
+    async function loadCatalogInfo() {
+      const res = await fetch("/api/catalog");
+      if (!res.ok) return;
+      const data = await res.json();
+      const c = data.counts;
+      catalogInfoEl.textContent = `Totale ${c.total} esercizi | E1: ${c.by_esonero["1"]} | E2: ${c.by_esonero["2"]} | E3: ${c.by_esonero["3"]} | array/liste: ${c.by_topic.array_liste} | mappe: ${c.by_topic.mappe} | altro: ${c.by_topic.altro}`;
+    }
+
+    async function startQuiz() {
+      const selectedEsonero = esoneroSelectEl.value || "2";
+      const res = await fetch(`/api/start?esonero=${encodeURIComponent(selectedEsonero)}`);
+      const data = await res.json();
+      if (!res.ok) {
+        showResult("error", data.error || "Errore nell'avvio del quiz.");
+        return;
+      }
+      state.sessionId = data.session_id;
+      state.questions = data.questions;
+      state.current = 0;
+      state.answers = {};
+      startTimer();
+      renderQuestion();
+
+      if (!data.java_available || !data.javac_available) {
+        envInfoEl.textContent = "Attenzione: Java o javac non trovati. I test non potranno essere eseguiti finche non installi un JDK.";
+      } else {
+        envInfoEl.textContent = `Ambiente Java rilevato. Quiz filtrato su Esonero ${selectedEsonero}. IDE pronto: evidenziazione sintassi, auto-closing parentesi, tab indent, suggerimenti base.`;
+      }
+    }
+
+    async function runCode() {
+      const q = currentQuestion();
+      if (!q) return;
+      saveCurrentCode();
+      showResult("error", "Esecuzione in corso...");
+
+      const payload = {
+        session_id: state.sessionId,
+        question_id: q.id,
+        code: state.answers[q.id],
+      };
+
+      const res = await fetch("/api/submit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+
+      if (data.status === "success") return showResult("ok", data.message);
+      if (data.status === "compile_error") return showResult("error", `Errore di compilazione:\n${data.message}`);
+      if (data.status === "environment_error") return showResult("error", data.message);
+
+      if (data.status === "runtime_error") {
+        let msg = `${data.message}`;
+        if (Array.isArray(data.runtime_failures) && data.runtime_failures.length) {
+          msg += "\n\nDettagli:";
+          for (const f of data.runtime_failures) msg += `\n- ${f.test}: ${f.details}`;
+        }
+        return showResult("error", msg);
+      }
+
+      if (data.status === "logic_error") {
+        let msg = `${data.message}`;
+        if (Array.isArray(data.failed_tests) && data.failed_tests.length) {
+          msg += "\n\nTest falliti:";
+          for (const f of data.failed_tests) msg += `\n- ${f.test}: ${f.details}`;
+        }
+        if (Array.isArray(data.runtime_failures) && data.runtime_failures.length) {
+          msg += "\n\nErrori runtime:";
+          for (const f of data.runtime_failures) msg += `\n- ${f.test}: ${f.details}`;
+        }
+        return showResult("error", msg);
+      }
+
+      showResult("error", "Risposta server non riconosciuta.");
+    }
+
+    function initMonaco() {
+      return new Promise((resolve) => {
+        window.require.config({ paths: { vs: "https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.52.2/min/vs" } });
+        window.require(["vs/editor/editor.main"], function () {
+          state.editor = monaco.editor.create(document.getElementById("editor"), {
+            value: "",
+            language: "java",
+            theme: "vs",
+            automaticLayout: true,
+            minimap: { enabled: false },
+            fontSize: 14,
+            tabSize: 4,
+            insertSpaces: true,
+            autoClosingBrackets: "always",
+            autoClosingQuotes: "always",
+            quickSuggestions: true,
+            suggestOnTriggerCharacters: true,
+            wordBasedSuggestions: "allDocuments",
+          });
+          resolve();
+        });
+      });
+    }
+
+    document.getElementById("prevBtn").addEventListener("click", () => {
+      saveCurrentCode();
+      if (state.current > 0) { state.current -= 1; renderQuestion(); }
+    });
+    document.getElementById("nextBtn").addEventListener("click", () => {
+      saveCurrentCode();
+      if (state.current < state.questions.length - 1) { state.current += 1; renderQuestion(); }
+    });
+    document.getElementById("runBtn").addEventListener("click", runCode);
+    document.getElementById("restartBtn").addEventListener("click", startQuiz);
+
+    initMonaco().then(async () => {
+      await loadCatalogInfo();
+      await startQuiz();
+    });
+  </script>
+</body>
+</html>

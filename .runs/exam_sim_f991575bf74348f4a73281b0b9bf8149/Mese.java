@@ -1,0 +1,11 @@
+enum Mese {
+    GENNAIO, FEBBRAIO, MARZO,
+    APRILE, MAGGIO, GIUGNO,
+    LUGLIO, AGOSTO, SETTEMBRE,
+    OTTOBRE, NOVEMBRE, DICEMBRE;
+
+    public Mese corrispondenzaStagionale(){
+        // TODO
+        return null;
+    }
+}

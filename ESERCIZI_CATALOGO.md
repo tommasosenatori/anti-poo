@@ -1,0 +1,57 @@
+# Catalogo Esercizi
+
+Totale esercizi: **38**
+
+## Conteggi Per Esonero
+- Esonero 1: 13
+- Esonero 2: 13
+- Esonero 3: 12
+
+## Conteggi Per Tipo
+- array_liste: 13
+- altro: 13
+- mappe: 12
+
+## Esonero 1
+- [array_liste] `calcola_media` - CalcolatoreMedia.calcolaMedia()
+- [array_liste] `collezione_compatta` - Collezione.aggiungi/elimina (array compatto)
+- [array_liste] `conta_occorrenze_posizione` - ContatoreOccorrenzePosizione.contaOccorrenze()
+- [array_liste] `decrescente_lista` - Decrescente.isDecrescente(List<Integer>)
+- [array_liste] `lista_simmetrica` - ListaInteri.isSimmetrica()
+- [array_liste] `lista_limitata_add` - ListaLimitata.add()
+- [array_liste] `strettamente_decrescente` - Monotonia.isStrettamenteDecrescente()
+- [array_liste] `conta_omonimi` - Persone.contaOmonimiDi()
+- [array_liste] `verifica_duplicati` - Persone.verificaDuplicati(String)
+- [array_liste] `righello_distanza` - Righello.distanza() punto-punto e punto-cerchio
+- [array_liste] `somma_dispari` - SequenzaDiInteri.sommaDispari()
+- [array_liste] `aggiungi_in_coda` - SequenzaDiStringhe.aggiungiInCoda()
+- [array_liste] `ha_doppioni` - SequenzaDiStringhe.haDoppioni()
+
+## Esonero 2
+- [altro] `autovettura_costruttori` - Autovettura costruttori
+- [altro] `biblioteca_ordinata` - Biblioteca.elencoOrdinatoPerAnnoTitolo()
+- [altro] `area_trapezio` - CalcolatoreAreaTrapezio.calcolaArea()
+- [altro] `conto_deposita` - ContoCorrente.deposita()
+- [altro] `immatricolazioni_comparator` - Immatricolazioni + Comparator eta/matricola
+- [altro] `mese_stagionale` - Mese.corrispondenzaStagionale()
+- [altro] `motocicletta_equals_hash` - Motocicletta equals/hashCode
+- [altro] `persona_comparable_desc` - Persona Comparable inverso
+- [altro] `persona_comparator_no_comparable` - Persona.getInsiemeOrdinato() senza Comparable
+- [altro] `soldato_costruttore` - Soldato extends Persona
+- [altro] `spedizione_equals_hashcode` - Spedizione.equals/hashCode
+- [altro] `immatricolazioni_compareto` - Studente.compareTo + Immatricolazioni sort naturale
+- [altro] `studente_equals` - Studente.equals(Object)
+
+## Esonero 3
+- [mappe] `conta_occorrenze` - ContatoreOccorrenze.conta(List<T>)
+- [mappe] `controlla_doppioni` - ControllaOccorrenze.controllaDoppioni()
+- [mappe] `submap` - CreatoreMappe.subMap()
+- [mappe] `creatore_mappe_unisci` - CreatoreMappe.unisci() con eccezione
+- [mappe] `prodotti_default_m1` - OperazioniProdotti.getProdotto2quantita() con default -1
+- [mappe] `prodotti_only_present` - OperazioniProdotti.getProdotto2quantita() solo presenti
+- [mappe] `studenti_voti_presenti` - OperazioniStudenti.getStudente2voto()
+- [mappe] `inverti_mappa` - OperazioniSuMappe.invertiMappa()
+- [mappe] `autore2canzoni` - RaggruppatoreCanzoniPerAutore.autore2canzoni()
+- [mappe] `regista2film` - RaggruppatoreFilmPerRegista.regista2film()
+- [mappe] `autore2libri` - RaggruppatoreLibriPerAutore.autore2libri()
+- [mappe] `marca2prodotti` - RaggruppatoreProdottiPerMarca.marca2prodotto()
