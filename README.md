@@ -19,6 +19,7 @@ http://127.0.0.1:8000
 
 - Genera un quiz con 10 domande random da una banca locale di 36 tracce (derivate dal PDF che hai fornito).
 - Puoi selezionare l'esonero (`1`, `2`, `3`) e ottenere 10 domande random solo di quella prova.
+- Pulsante `Mostra Soluzione` per l'esercizio corrente (quando disponibile nel dataset).
 - Ogni domanda ha test nascosti.
 - Il codice Java viene compilato e testato localmente con test nascosti.
 - Editor stile IDE (Monaco): evidenziazione sintassi Java, auto-closing parentesi/virgolette, indentazione con TAB, suggerimenti base.

@@ -246,7 +246,8 @@ class Handler(BaseHTTPRequestHandler):
         self.send_error(HTTPStatus.NOT_FOUND, "Not found")
 
     def do_POST(self):
-        if urlparse(self.path).path != "/api/submit":
+        endpoint = urlparse(self.path).path
+        if endpoint not in ("/api/submit", "/api/solution"):
             self.send_error(HTTPStatus.NOT_FOUND, "Not found")
             return
         clen = int(self.headers.get("Content-Length", "0"))
@@ -259,8 +260,7 @@ class Handler(BaseHTTPRequestHandler):
 
         sid = payload.get("session_id")
         qid = payload.get("question_id")
-        code = payload.get("code", "")
-        if not sid or not qid or not isinstance(code, str):
+        if not sid or not qid:
             self._json({"error": "Payload incompleto"}, code=HTTPStatus.BAD_REQUEST)
             return
 
@@ -278,6 +278,25 @@ class Handler(BaseHTTPRequestHandler):
             self._json({"error": "Domanda non trovata"}, code=HTTPStatus.BAD_REQUEST)
             return
 
+        if endpoint == "/api/solution":
+            solution = question.get("solution_code")
+            if not solution:
+                self._json({"status": "not_available", "message": "Soluzione non disponibile per questa domanda."})
+                return
+            self._json(
+                {
+                    "status": "ok",
+                    "question_id": qid,
+                    "title": question.get("title"),
+                    "solution_code": solution,
+                }
+            )
+            return
+
+        code = payload.get("code", "")
+        if not isinstance(code, str):
+            self._json({"error": "Payload incompleto"}, code=HTTPStatus.BAD_REQUEST)
+            return
         self._json(run_submission(question, code))
 
     def log_message(self, fmt, *args):

@@ -20,7 +20,14 @@ QUESTION_BANK = [{'id': 'calcola_media',
                  '    }\n'
                  '}\n',
   'esonero': 1,
-  'topic': 'array_liste'},
+  'topic': 'array_liste',
+  'solution_code': 'public class CalcolatoreMedia {\n'
+                   '    public double calcolaMedia(int[] sequenza){\n'
+                   '        int somma = 0;\n'
+                   '        for (int n : sequenza) somma += n;\n'
+                   '        return (double) somma / sequenza.length;\n'
+                   '    }\n'
+                   '}\n'},
  {'id': 'collezione_compatta',
   'title': 'Collezione.aggiungi/elimina (array compatto)',
   'prompt': 'Completa `aggiungi(String)` e `elimina(String)` della classe Collezione con array compatto e contatore '
@@ -88,7 +95,48 @@ QUESTION_BANK = [{'id': 'calcola_media',
                  '\n'
                  '        if (failed == 0) System.out.println("ALL_TESTS_PASSED");\n'
                  '    }\n'
-                 '}\n'},
+                 '}\n',
+  'solution_code': 'public class Collezione {\n'
+                   '    private String[] elementi;\n'
+                   '    private int numeroElementi;\n'
+                   '\n'
+                   '    public Collezione(int dimensioneMax) {\n'
+                   '        this.elementi = new String[dimensioneMax];\n'
+                   '        this.numeroElementi = 0;\n'
+                   '    }\n'
+                   '\n'
+                   '    public Collezione(String... elementi) {\n'
+                   '        this.elementi = elementi;\n'
+                   '        this.numeroElementi = elementi.length;\n'
+                   '    }\n'
+                   '\n'
+                   '    public int getNumeroElementi() {\n'
+                   '        return this.numeroElementi;\n'
+                   '    }\n'
+                   '\n'
+                   '    public boolean aggiungi(String elemento) {\n'
+                   '        if (numeroElementi < elementi.length) {\n'
+                   '            elementi[numeroElementi] = elemento;\n'
+                   '            numeroElementi++;\n'
+                   '            return true;\n'
+                   '        }\n'
+                   '        return false;\n'
+                   '    }\n'
+                   '\n'
+                   '    public boolean elimina(String wanted) {\n'
+                   '        for (int i = 0; i < numeroElementi; i++) {\n'
+                   '            if (elementi[i].equals(wanted)) {\n'
+                   '                for (int j = i; j < numeroElementi - 1; j++) {\n'
+                   '                    elementi[j] = elementi[j + 1];\n'
+                   '                }\n'
+                   '                elementi[numeroElementi - 1] = null;\n'
+                   '                numeroElementi--;\n'
+                   '                return true;\n'
+                   '            }\n'
+                   '        }\n'
+                   '        return false;\n'
+                   '    }\n'
+                   '}\n'},
  {'id': 'conta_occorrenze_posizione',
   'title': 'ContatoreOccorrenzePosizione.contaOccorrenze()',
   'prompt': 'Implementa contaOccorrenze(sequenza,daControllare) come nel testo: output allineato agli indici di '
@@ -114,7 +162,18 @@ QUESTION_BANK = [{'id': 'calcola_media',
                  '    }\n'
                  '}\n',
   'esonero': 1,
-  'topic': 'array_liste'},
+  'topic': 'array_liste',
+  'solution_code': 'public class ContatoreOccorrenzePosizione {\n'
+                   '    public int[] contaOccorrenze(String[] sequenza, String[] daControllare){\n'
+                   '        int[] out = new int[daControllare.length];\n'
+                   '        for (int i = 0; i < daControllare.length; i++) {\n'
+                   '            for (String s : sequenza) {\n'
+                   '                if (daControllare[i].equals(s)) out[i]++;\n'
+                   '            }\n'
+                   '        }\n'
+                   '        return out;\n'
+                   '    }\n'
+                   '}\n'},
  {'id': 'decrescente_lista',
   'title': 'Decrescente.isDecrescente(List<Integer>)',
   'prompt': 'Ritorna true se la lista e strettamente decrescente; se vuota lancia NoSuchElementException.',
@@ -244,7 +303,19 @@ QUESTION_BANK = [{'id': 'calcola_media',
                  '    }\n'
                  '}\n',
   'esonero': 1,
-  'topic': 'array_liste'},
+  'topic': 'array_liste',
+  'solution_code': 'public class Persone {\n'
+                   '    private String[] nomi;\n'
+                   '    public Persone(int n){ this.nomi = new String[n]; }\n'
+                   '    public int contaOmonimiDi(String nome){\n'
+                   '        int omonimi = 0;\n'
+                   '        for (String s : nomi) {\n'
+                   '            if (s != null && s.equals(nome)) omonimi++;\n'
+                   '        }\n'
+                   '        return omonimi;\n'
+                   '    }\n'
+                   '    public void aggiungiNome(int indice,String nome){ this.nomi[indice] = nome; }\n'
+                   '}\n'},
  {'id': 'verifica_duplicati',
   'title': 'Persone.verificaDuplicati(String)',
   'prompt': "Implementa verificaDuplicati(String nome): true se il nome compare almeno due volte nell'array nomi.",
@@ -271,7 +342,22 @@ QUESTION_BANK = [{'id': 'calcola_media',
                  '    }\n'
                  '}\n',
   'esonero': 1,
-  'topic': 'array_liste'},
+  'topic': 'array_liste',
+  'solution_code': 'public class Persone {\n'
+                   '    private String[] nomi;\n'
+                   '    public Persone(int numeroPersone) { this.nomi = new String[numeroPersone]; }\n'
+                   '    public void aggiungiNome(String nome, int indice) { this.nomi[indice] = nome; }\n'
+                   '    public boolean verificaDuplicati(String nome) {\n'
+                   '        int conta = 0;\n'
+                   '        for (String s : this.nomi) {\n'
+                   '            if (s != null && s.equals(nome)) {\n'
+                   '                conta++;\n'
+                   '                if (conta > 1) return true;\n'
+                   '            }\n'
+                   '        }\n'
+                   '        return false;\n'
+                   '    }\n'
+                   '}\n'},
  {'id': 'righello_distanza',
   'title': 'Righello.distanza() punto-punto e punto-cerchio',
   'prompt': 'Completa i due overload `distanza`: tra due punti e tra punto/cerchio con formula `abs(distanzaCentro - '
@@ -344,7 +430,48 @@ QUESTION_BANK = [{'id': 'calcola_media',
                  '\n'
                  '        if (failed == 0) System.out.println("ALL_TESTS_PASSED");\n'
                  '    }\n'
-                 '}\n'},
+                 '}\n',
+  'solution_code': 'import static java.lang.Math.sqrt;\n'
+                   'import static java.lang.Math.abs;\n'
+                   '\n'
+                   'class Punto {\n'
+                   '    private int x;\n'
+                   '    private int y;\n'
+                   '\n'
+                   '    public Punto(int x, int y) {\n'
+                   '        this.x = x;\n'
+                   '        this.y = y;\n'
+                   '    }\n'
+                   '\n'
+                   '    public int getX() { return x; }\n'
+                   '    public int getY() { return y; }\n'
+                   '}\n'
+                   '\n'
+                   'class Cerchio {\n'
+                   '    private Punto centro;\n'
+                   '    private int raggio;\n'
+                   '\n'
+                   '    public Cerchio(Punto centro, int raggio) {\n'
+                   '        this.centro = centro;\n'
+                   '        this.raggio = raggio;\n'
+                   '    }\n'
+                   '\n'
+                   '    public Punto getCentro() { return centro; }\n'
+                   '    public int getRaggio() { return raggio; }\n'
+                   '}\n'
+                   '\n'
+                   'public class Righello {\n'
+                   '    public double distanza(Punto p1, Punto p2) {\n'
+                   '        double dx = p1.getX() - p2.getX();\n'
+                   '        double dy = p1.getY() - p2.getY();\n'
+                   '        return sqrt(dx * dx + dy * dy);\n'
+                   '    }\n'
+                   '\n'
+                   '    public double distanza(Punto punto, Cerchio c) {\n'
+                   '        double distCentro = distanza(punto, c.getCentro());\n'
+                   '        return abs(distCentro - c.getRaggio());\n'
+                   '    }\n'
+                   '}\n'},
  {'id': 'somma_dispari',
   'title': 'SequenzaDiInteri.sommaDispari()',
   'prompt': 'Implementa il metodo sommaDispari() che restituisce la somma degli elementi in posizione dispari '
@@ -381,7 +508,26 @@ QUESTION_BANK = [{'id': 'calcola_media',
                  '    }\n'
                  '}\n',
   'esonero': 1,
-  'topic': 'array_liste'},
+  'topic': 'array_liste',
+  'solution_code': 'public class SequenzaDiInteri {\n'
+                   '    private int[] sequenza;\n'
+                   '\n'
+                   '    public SequenzaDiInteri(int numeroInteri) {\n'
+                   '        this.sequenza = new int[numeroInteri];\n'
+                   '    }\n'
+                   '\n'
+                   '    public void setElemento(int indice, int valore) {\n'
+                   '        this.sequenza[indice] = valore;\n'
+                   '    }\n'
+                   '\n'
+                   '    public int sommaDispari() {\n'
+                   '        int somma = 0;\n'
+                   '        for (int i = 0; i < sequenza.length; i++) {\n'
+                   '            if (i % 2 == 1) somma += sequenza[i];\n'
+                   '        }\n'
+                   '        return somma;\n'
+                   '    }\n'
+                   '}\n'},
  {'id': 'aggiungi_in_coda',
   'title': 'SequenzaDiStringhe.aggiungiInCoda()',
   'prompt': "Implementa aggiungiInCoda(String): aggiunge in coda solo se l'array non e pieno.",
@@ -410,7 +556,20 @@ QUESTION_BANK = [{'id': 'calcola_media',
                  '    }\n'
                  '}\n',
   'esonero': 1,
-  'topic': 'array_liste'},
+  'topic': 'array_liste',
+  'solution_code': 'public class SequenzaDiStringhe {\n'
+                   '    public String[] sequenza;\n'
+                   '    public SequenzaDiStringhe(int dimensione){ this.sequenza = new String[dimensione]; }\n'
+                   '    public void aggiungiStringa(String s, int posizione){ this.sequenza[posizione] = s; }\n'
+                   '    public void aggiungiInCoda(String nuovaStringa){\n'
+                   '        for (int i = 0; i < sequenza.length; i++) {\n'
+                   '            if (sequenza[i] == null) {\n'
+                   '                sequenza[i] = nuovaStringa;\n'
+                   '                return;\n'
+                   '            }\n'
+                   '        }\n'
+                   '    }\n'
+                   '}\n'},
  {'id': 'ha_doppioni',
   'title': 'SequenzaDiStringhe.haDoppioni()',
   'prompt': "Implementa haDoppioni() che restituisce true se nell'array sequenza ci sono almeno due stringhe uguali.",
@@ -440,7 +599,21 @@ QUESTION_BANK = [{'id': 'calcola_media',
                  '    }\n'
                  '}\n',
   'esonero': 1,
-  'topic': 'array_liste'},
+  'topic': 'array_liste',
+  'solution_code': 'public class SequenzaDiStringhe {\n'
+                   '    private String[] sequenza;\n'
+                   '    public SequenzaDiStringhe(int dimensione) { this.sequenza = new String[dimensione]; }\n'
+                   '    public void aggiungiStringa(String stringa, int posizione) { this.sequenza[posizione] = '
+                   'stringa; }\n'
+                   '    public boolean haDoppioni() {\n'
+                   '        for (int i = 0; i < sequenza.length - 1; i++) {\n'
+                   '            for (int j = i + 1; j < sequenza.length; j++) {\n'
+                   '                if (sequenza[i] != null && sequenza[i].equals(sequenza[j])) return true;\n'
+                   '            }\n'
+                   '        }\n'
+                   '        return false;\n'
+                   '    }\n'
+                   '}\n'},
  {'id': 'autovettura_costruttori',
   'title': 'Autovettura costruttori',
   'prompt': 'Completa la classe Autovettura: costruttore con parametro assegna modello, costruttore vuoto lascia '
@@ -885,7 +1058,17 @@ QUESTION_BANK = [{'id': 'calcola_media',
                  '    }\n'
                  '}\n',
   'esonero': 3,
-  'topic': 'mappe'},
+  'topic': 'mappe',
+  'solution_code': 'import java.util.*;\n'
+                   'public class ContatoreOccorrenze {\n'
+                   '    public static <T> Map<T, Integer> conta(List<T> l1) {\n'
+                   '        Map<T, Integer> mappa = new HashMap<>();\n'
+                   '        for (T t : l1) {\n'
+                   '            mappa.put(t, mappa.getOrDefault(t, 0) + 1);\n'
+                   '        }\n'
+                   '        return mappa;\n'
+                   '    }\n'
+                   '}\n'},
  {'id': 'controlla_doppioni',
   'title': 'ControllaOccorrenze.controllaDoppioni()',
   'prompt': 'Data una lista, restituisci mappa elemento->true/false se compare almeno due volte.',
@@ -1002,7 +1185,27 @@ QUESTION_BANK = [{'id': 'calcola_media',
                  '    }\n'
                  '}\n',
   'esonero': 3,
-  'topic': 'mappe'},
+  'topic': 'mappe',
+  'solution_code': 'import java.util.*;\n'
+                   'class Prodotto {\n'
+                   '    private String codice; private int peso;\n'
+                   '    public Prodotto(String codice, int peso){ this.codice=codice; this.peso=peso; }\n'
+                   '    public String getCodice(){ return codice; }\n'
+                   '    public int getPeso(){ return peso; }\n'
+                   '    @Override public int hashCode(){ return codice.hashCode(); }\n'
+                   '    @Override public boolean equals(Object o){ Prodotto that=(Prodotto)o; return '
+                   'this.getCodice().equals(that.getCodice()); }\n'
+                   '}\n'
+                   'public class OperazioniProdotti {\n'
+                   '    public Map<Prodotto,Integer> getProdotto2quantita(Map<String,Prodotto> cod2prod, '
+                   'Map<String,Integer> cod2qta){\n'
+                   '        Map<Prodotto,Integer> out = new HashMap<>();\n'
+                   '        for (String k : cod2prod.keySet()) {\n'
+                   '            out.put(cod2prod.get(k), cod2qta.containsKey(k) ? cod2qta.get(k) : -1);\n'
+                   '        }\n'
+                   '        return out;\n'
+                   '    }\n'
+                   '}\n'},
  {'id': 'prodotti_only_present',
   'title': 'OperazioniProdotti.getProdotto2quantita() solo presenti',
   'prompt': 'Variante: includi in output solo prodotti con quantita presente in cod2qta.',

@@ -59,6 +59,22 @@
     }
     .result.error { display: block; background: var(--danger-bg); color: var(--danger-text); border-color: #fca5a5; }
     .result.ok { display: block; background: var(--ok-bg); color: var(--ok-text); border-color: #86efac; }
+    .solution-box {
+      margin-top: 12px;
+      border: 1px solid #cbd5e1;
+      border-radius: 10px;
+      padding: 10px;
+      background: #f8fafc;
+      display: none;
+    }
+    .solution-box.show { display: block; }
+    .solution-box pre {
+      margin: 0;
+      white-space: pre-wrap;
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 13px;
+      line-height: 1.45;
+    }
     .badge {
       display: inline-block; padding: 4px 8px; border-radius: 999px; font-size: 12px;
       font-weight: 600; background: #e2e8f0; color: #0f172a; margin-right: 6px;
@@ -98,9 +114,11 @@
       <div class="row">
         <button class="secondary" id="prevBtn">Indietro</button>
         <button class="secondary" id="nextBtn">Avanti</button>
+        <button class="secondary" id="solutionBtn">Mostra Soluzione</button>
         <button class="primary" id="runBtn">Esegui Codice</button>
       </div>
       <div id="result" class="result"></div>
+      <div id="solutionBox" class="solution-box"><pre id="solutionCode"></pre></div>
     </div>
   </div>
 
@@ -125,6 +143,8 @@
     const envInfoEl = document.getElementById("envInfo");
     const catalogInfoEl = document.getElementById("catalogInfo");
     const esoneroSelectEl = document.getElementById("esoneroSelect");
+    const solutionBoxEl = document.getElementById("solutionBox");
+    const solutionCodeEl = document.getElementById("solutionCode");
 
     function fmtTime(total) {
       const mm = String(Math.floor(total / 60)).padStart(2, "0");
@@ -168,6 +188,11 @@
       resultEl.textContent = "";
     }
 
+    function hideSolution() {
+      solutionBoxEl.className = "solution-box";
+      solutionCodeEl.textContent = "";
+    }
+
     function renderQuestion() {
       const q = currentQuestion();
       if (!q) return;
@@ -176,6 +201,7 @@
       promptEl.textContent = q.prompt;
       editorSetValue(state.answers[q.id] ?? q.starter_code);
       clearResult();
+      hideSolution();
     }
 
     async function loadCatalogInfo() {
@@ -256,6 +282,28 @@
       showResult("error", "Risposta server non riconosciuta.");
     }
 
+    async function showSolution() {
+      const q = currentQuestion();
+      if (!q) return;
+      const payload = {
+        session_id: state.sessionId,
+        question_id: q.id,
+      };
+      const res = await fetch("/api/solution", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+      if (data.status === "ok") {
+        solutionCodeEl.textContent = data.solution_code;
+        solutionBoxEl.className = "solution-box show";
+      } else {
+        solutionCodeEl.textContent = data.message || "Soluzione non disponibile.";
+        solutionBoxEl.className = "solution-box show";
+      }
+    }
+
     function initMonaco() {
       return new Promise((resolve) => {
         window.require.config({ paths: { vs: "https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.52.2/min/vs" } });
@@ -288,6 +336,7 @@
       saveCurrentCode();
       if (state.current < state.questions.length - 1) { state.current += 1; renderQuestion(); }
     });
+    document.getElementById("solutionBtn").addEventListener("click", showSolution);
     document.getElementById("runBtn").addEventListener("click", runCode);
     document.getElementById("restartBtn").addEventListener("click", startQuiz);
 
